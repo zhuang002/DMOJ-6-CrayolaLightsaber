@@ -80,7 +80,7 @@ public class CrayolaLightsaber {
                 continue;
             }
             int count = markers[color];
-            if (count == 0) {
+            if (count <= 0) {
                 continue;
             }
             markers[color] = count - 1;
@@ -125,31 +125,37 @@ public class CrayolaLightsaber {
 
 class MyKey {
 
-    int previousColor;
+    int previousColorCount;
     int[] ar;
 
     public MyKey(int color, int[] markers) {
-        this.previousColor=color;
-        this.ar=Arrays.copyOf(markers, markers.length);
+         this.ar=Arrays.copyOf(markers, markers.length);
+        if (color>=markers.length)
+            this.previousColorCount=-1;
+        else {
+            this.previousColorCount=markers[color];
+            this.ar[color]=-1;
+        }
+       
+
+      
+        Arrays.sort(this.ar);
     }
 
     @Override
     public boolean equals(Object obj) {
         MyKey key = (MyKey) obj;
-        return (this.previousColor==key.previousColor &&
-                this.ar[0] == key.ar[0]
-                && this.ar[1] == key.ar[1]
-                && this.ar[2] == key.ar[2]
-                && this.ar[3] == key.ar[3]
-                && this.ar[4] == key.ar[4]
-                && this.ar[5] == key.ar[5]
-        );
+        boolean ret=this.previousColorCount==key.previousColorCount;
+        for (int i=0;i<this.ar.length;i++) {
+            ret = ret && (this.ar[i] == key.ar[i]);
+        }
+        return ret;
     }
 
     @Override
     public int hashCode() {
         int hashCode = 1;
-        hashCode = 31 * hashCode + this.previousColor;
+        hashCode = 31 * hashCode + this.previousColorCount;
         hashCode = 31 * hashCode + java.util.Arrays.hashCode(ar);
         return hashCode;
     }
