@@ -61,13 +61,13 @@ public class CrayolaLightsaber {
         System.out.println(getStickLength(7, markers));
     }
 
-    private static int getStickLength(int previousColor, int[] markers) {
-        int[] changedColor=preprocessMarkers(markers);
-        if (changedColor!=null) {
+    private static int getStickLength(int previousColor, int[] originalMarkers) {
+        int[] markers=preprocessMarkers(originalMarkers);
+        /*if (changedColor!=null) {
             int length=getStickLength(previousColor,markers);
             markers[changedColor[0]]+=changedColor[1];
             return length;
-        }
+        }*/
         MyKey key = new MyKey(previousColor, markers);
         if (recursiveBackup.containsKey(key)) {
             return recursiveBackup.get(key);
@@ -96,8 +96,9 @@ public class CrayolaLightsaber {
         return maxLength;
     }
 
-    private static int[] preprocessMarkers(int[] markers) {
-        int[] changedColor=null;
+    private static int[] preprocessMarkers(int[] originalMarkers) {
+        int[] markers=Arrays.copyOf(originalMarkers,originalMarkers.length);
+        
         int maxColor=-1;
         int maxCount=-1;
         int totalMarkers=0;
@@ -113,42 +114,42 @@ public class CrayolaLightsaber {
         int otherMarkers=totalMarkers-maxCount;
         if (maxCount>otherMarkers+1){
             markers[maxColor]=otherMarkers+1;
-            changedColor=new int[2];
-            changedColor[0]=maxColor;
-            changedColor[1]=maxCount-otherMarkers-1;
         }
-        return changedColor;
+        
+        
+        
+        return markers;
     }
 
 }
 
 class MyKey {
 
+    int previousColor;
     int[] ar;
 
     public MyKey(int color, int[] markers) {
-        ar = new int[markers.length + 1];
-        ar[0] = color;
-        for (int i = 0; i < markers.length; i++) {
-            ar[i + 1] = markers[i];
-        }
+        this.previousColor=color;
+        this.ar=Arrays.copyOf(markers, markers.length);
     }
 
     @Override
     public boolean equals(Object obj) {
         MyKey key = (MyKey) obj;
-        return (this.ar[0] == key.ar[0]
+        return (this.previousColor==key.previousColor &&
+                this.ar[0] == key.ar[0]
                 && this.ar[1] == key.ar[1]
                 && this.ar[2] == key.ar[2]
                 && this.ar[3] == key.ar[3]
                 && this.ar[4] == key.ar[4]
                 && this.ar[5] == key.ar[5]
-                && this.ar[6] == key.ar[6]);
+        );
     }
 
     @Override
     public int hashCode() {
         int hashCode = 1;
+        hashCode = 31 * hashCode + this.previousColor;
         hashCode = 31 * hashCode + java.util.Arrays.hashCode(ar);
         return hashCode;
     }
